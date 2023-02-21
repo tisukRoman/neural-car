@@ -6,17 +6,22 @@ class Car {
     this.height = height;
 
     this.speed = 0;
-    this.maxSpeed = 3;
-    this.acceleration = 0.1;
+    this.maxSpeed = 4;
+    this.acceleration = 0.2;
     this.friction = 0.05;
     this.angle = 0;
+    this.damaged = false;
 
     this.sensor = new Sensor(this);
     this.controls = new Controls();
   }
 
   update(roadBorders) {
-    this.#move();
+    if (!this.damaged) {
+      this.#move();
+      this.polygon = this.#createPolygon();
+      this.damaged = this.#assessDamage(roadBorders);
+    }
     this.sensor.update(roadBorders);
   }
 
@@ -64,16 +69,53 @@ class Car {
     this.y -= Math.cos(this.angle) * this.speed;
   }
 
+  #createPolygon() {
+    const points = [];
+
+    const rad = Math.hypot(this.width, this.height) / 2;
+    const alpha = Math.atan2(this.width, this.height);
+
+    points.push({
+      x: this.x - Math.sin(this.angle - alpha) * rad,
+      y: this.y - Math.cos(this.angle - alpha) * rad,
+    });
+    points.push({
+      x: this.x - Math.sin(this.angle + alpha) * rad,
+      y: this.y - Math.cos(this.angle + alpha) * rad,
+    });
+    points.push({
+      x: this.x - Math.sin(Math.PI + this.angle - alpha) * rad,
+      y: this.y - Math.cos(Math.PI + this.angle - alpha) * rad,
+    });
+    points.push({
+      x: this.x - Math.sin(Math.PI + this.angle + alpha) * rad,
+      y: this.y - Math.cos(Math.PI + this.angle + alpha) * rad,
+    });
+    return points;
+  }
+
+  #assessDamage(roadBorders) {
+    return roadBorders.some((border) => polysIntersect(this.polygon, border));
+  }
+
   draw(ctx) {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(-this.angle);
+    if (this.damaged) {
+      ctx.fillStyle = "gray";
+    } else {
+      ctx.fillStyle = "black";
+    }
 
     ctx.beginPath();
-    ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
-    ctx.fill();
 
-    ctx.restore();
+    this.polygon.forEach((point, index) => {
+      if (index == 0) {
+        ctx.moveTo(point.x, point.y);
+      } else {
+        ctx.lineTo(point.x, point.y);
+      }
+    });
+
+    ctx.fill();
 
     this.sensor.draw(ctx);
   }
