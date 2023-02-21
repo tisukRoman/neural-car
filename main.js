@@ -9,7 +9,7 @@ const networkCtx = networkCanvas.getContext("2d");
 
 const road = new Road(carCanvas.width / 2, carCanvas.width * 0.9);
 
-const cars = generateCars(300);
+const cars = generateCars(1);
 
 let bestCar = cars[0];
 
@@ -60,7 +60,7 @@ function animate(time) {
   cars.forEach((car) => car.update(road.borders, traffic));
 
   // find the fastest car
-  const bestCar = cars.find((c) => c.y == Math.min(...cars.map((c) => c.y)));
+  bestCar = cars.find((c) => c.y == Math.min(...cars.map((c) => c.y)));
 
   // reset canvas heights
   carCanvas.height = window.innerHeight;
