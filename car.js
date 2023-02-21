@@ -121,7 +121,7 @@ class Car {
     );
   }
 
-  draw(ctx, color = "black") {
+  draw(ctx, color = "black", isSensor) {
     if (this.damaged) {
       ctx.fillStyle = "gray";
     } else {
@@ -140,7 +140,7 @@ class Car {
 
     ctx.fill();
 
-    if (this.sensor) {
+    if (this.sensor && isSensor) {
       this.sensor.draw(ctx);
     }
   }
