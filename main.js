@@ -13,11 +13,19 @@ const cars = generateCars(100);
 
 let bestCar = cars[0];
 
-if (localStorage.getItem("bestBrain")) {
-  bestCar.brain = JSON.parse(localStorage.getItem("bestBrain"));
-}
+(function giveBestCarBestBrain() {
+  const bestBrain = localStorage.getItem("bestBrain");
 
-const traffic = [new Car(road.getLaneCenter(1), -100, 30, 50, "DUMMY", 3)];
+  if (bestBrain) {
+    bestCar.brain = JSON.parse(bestBrain);
+  }
+})();
+
+const traffic = [
+  new Car(road.getLaneCenter(1), -100, 30, 50, "DUMMY", 3),
+  new Car(road.getLaneCenter(0), -300, 30, 50, "DUMMY", 3),
+  new Car(road.getLaneCenter(2), -300, 30, 50, "DUMMY", 3),
+];
 
 animate();
 
